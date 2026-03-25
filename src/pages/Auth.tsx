@@ -16,7 +16,7 @@ export default function Auth() {
       await loginWithGoogle();
     } catch (err) {
       console.error(err);
-      setError('Failed to sign in with Google. Please try again.');
+      setError(`Login Error: ${err instanceof Error ? err.message : JSON.stringify(err)}`);
     } finally {
       setLoading(false);
     }
