@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "95370397541",
+    "project_id": "gen-lang-client-0982103797",
+    "storage_bucket": "gen-lang-client-0982103797.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:95370397541:android:eb7fdde5e3909b6383438c",
+        "android_client_info": {
+          "package_name": "com.vibejournal.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "95370397541-jfc7osj5nmj1a5irj9vua9ac8rv4moje.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0jy7gA2zHFcKm75tjm8I8qClJWsG40fg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "95370397541-jfc7osj5nmj1a5irj9vua9ac8rv4moje.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,7 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential, signOut, onAuthStateChanged, User } from 'firebase/auth';
+import { Capacitor } from '@capacitor/core';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { 
   getFirestore, 
   collection, 
@@ -39,8 +41,22 @@ enableMultiTabIndexedDbPersistence(db).catch((err) => {
 });
 
 // Auth Helpers
-export const loginWithGoogle = () => signInWithPopup(auth, googleProvider);
-export const logout = () => signOut(auth);
+export const loginWithGoogle = async () => {
+  if (Capacitor.isNativePlatform()) {
+    const result = await FirebaseAuthentication.signInWithGoogle();
+    const credential = GoogleAuthProvider.credential(result.credential?.idToken);
+    return signInWithCredential(auth, credential);
+  } else {
+    return signInWithPopup(auth, googleProvider);
+  }
+};
+
+export const logout = async () => {
+  if (Capacitor.isNativePlatform()) {
+    await FirebaseAuthentication.signOut();
+  }
+  return signOut(auth);
+};
 
 // Firestore Error Handler Spec
 export enum OperationType {
