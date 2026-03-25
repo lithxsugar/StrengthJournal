@@ -1,0 +1,48 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "JournalEntry": {
+      "title": "Journal Entry",
+      "description": "Daily journal entry focusing on character strengths",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "action": { "type": "string", "description": "Tindakan" },
+        "time": { "type": "string", "description": "Waktu" },
+        "place": { "type": "string", "description": "Tempat" },
+        "obstacles": { "type": "string", "description": "Rintangan" },
+        "opportunities": { "type": "string", "description": "Peluang" },
+        "strengths": { 
+          "type": "array", 
+          "items": { "type": "string" },
+          "description": "Tanggapan/Kekuatan Karakter" 
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "date", "action", "strengths"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile document"
+    },
+    "/entries/{entryId}": {
+      "schema": "JournalEntry",
+      "description": "A single journal entry"
+    }
+  }
+}

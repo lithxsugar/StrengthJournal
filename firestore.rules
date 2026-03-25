@@ -1,0 +1,119 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: userId (uid)
+    // Fields:
+    //   - uid: string (required)
+    //   - displayName: string (optional)
+    //   - email: string (required)
+    //   - photoURL: string (optional)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: entries
+    // Document ID: entryId (auto-generated)
+    // Fields:
+    //   - userId: string (required)
+    //   - date: timestamp (required)
+    //   - action: string (required, tindakan)
+    //   - time: string (optional, waktu)
+    //   - place: string (optional, tempat)
+    //   - obstacles: string (optional, rintangan)
+    //   - opportunities: string (optional, peluang)
+    //   - strengths: list (required, tanggapan/kekuatan karakter)
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "animefor9yearsolds@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidList(list, maxSize) {
+      return list is list && list.size() > 0 && list.size() <= maxSize;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return hasRequiredFields(['uid', 'email', 'createdAt']) &&
+             data.uid is string && data.uid.size() > 0 &&
+             data.email is string && isValidEmail(data.email) &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidEntry(data) {
+      return hasRequiredFields(['userId', 'date', 'action', 'strengths', 'createdAt']) &&
+             data.userId is string && data.userId.size() > 0 &&
+             data.date is timestamp &&
+             data.action is string && data.action.size() > 0 && data.action.size() < 5000 &&
+             isValidList(data.strengths, 24) &&
+             data.createdAt is timestamp &&
+             (!('time' in data) || (data.time is string && data.time.size() < 200)) &&
+             (!('place' in data) || (data.place is string && data.place.size() < 500)) &&
+             (!('obstacles' in data) || (data.obstacles is string && data.obstacles.size() < 5000)) &&
+             (!('opportunities' in data) || (data.opportunities is string && data.opportunities.size() < 5000));
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && isValidUser(request.resource.data) && (isOwner(userId) || isAdmin());
+      allow update: if isAuthenticated() && isValidUser(request.resource.data) && (isOwner(userId) || isAdmin()) && 
+                    request.resource.data.uid == resource.data.uid;
+      allow delete: if isAdmin();
+    }
+
+    match /entries/{entryId} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.userId || isAdmin());
+      allow create: if isAuthenticated() && isValidEntry(request.resource.data) && (request.auth.uid == request.resource.data.userId || isAdmin());
+      allow update: if isAuthenticated() && isValidEntry(request.resource.data) && (request.auth.uid == resource.data.userId || isAdmin()) &&
+                    request.resource.data.userId == resource.data.userId;
+      allow delete: if isAuthenticated() && (request.auth.uid == resource.data.userId || isAdmin());
+    }
+
+    match /test/{docId} {
+      allow read: if true;
+    }
+  }
+}

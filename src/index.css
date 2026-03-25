@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-paper: #F8FAFC;
+  --color-ink: #0F172A;
+  --color-accent: #0EA5E9; /* Sky Blue */
+  --color-gold: #0284C7;   /* Deep Sky Blue */
+}
+
+html[data-font="sans"] { --font-main: var(--font-sans); }
+html[data-font="serif"] { --font-main: var(--font-serif); }
+html[data-font="mono"] { --font-main: var(--font-mono); }
+
+html[data-size="small"] {
+  font-size: 14px;
+}
+
+html[data-size="medium"] {
+  font-size: 16px;
+}
+
+html[data-size="large"] {
+  font-size: 18px;
+}
+
+@layer base {
+  body {
+    @apply bg-paper text-ink selection:bg-accent/10 selection:text-accent;
+    font-family: var(--font-main, var(--font-sans));
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif italic tracking-tight;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/40 backdrop-blur-md border border-ink/5 shadow-sm transition-all duration-300;
+  }
+
+  .premium-button {
+    @apply bg-accent text-white px-8 py-4 rounded-full font-serif italic text-lg shadow-lg shadow-accent/20 hover:shadow-xl hover:shadow-accent/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .input-field {
+    @apply w-full bg-ink/[0.02] border-b border-ink/10 px-0 py-4 font-serif italic text-2xl text-ink placeholder:text-ink/20 focus:outline-none focus:border-accent transition-all duration-300;
+  }
+
+  .label-text {
+    @apply text-[11px] uppercase tracking-[0.3em] font-bold text-ink/30;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-ink/5 rounded-full hover:bg-ink/10 transition-colors;
+}
